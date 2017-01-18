@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Blochead</title>
+  </head>
+  <body>
+    <h1>Blochead</h1>
+    <p>
+      When you need a little more Bloc in your <strike>life</strike> avatar.
+    </p>
+
+    <p>
+      <input type="file" id="userImage" name="userImage">
+    </p>
+
+    <canvas id="canvas" width="300" height="300" style="border: 2px solid #333;"></canvas>
+
+    <p>
+      <button type="button" id="render">Awww yeah, download dat</button>
+    </p>
+
+    <h2>Coming Soon</h2>
+    <ul>
+      <li>Ability to choose overlay image</li>
+      <li>Ability to choose which corner to put the overlay in</li>
+      <li>Prettier page</li>
+    </ul>
+
+    <h2>Caveats</h2>
+    <p>
+      Currently works in Chrome, Firefox, and Edge 13. Safari and IE don't like a.download.
+    </p>
+
+    <script>
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+
+      var overlay = new Image();
+      overlay.src = 'overlay.png';
+
+      overlay.onload = function () {
+        drawOverlay();
+      };
+
+      var uploadedFilename = '';
+
+      function drawOverlay () {
+        context.drawImage(overlay, 225, 225, 50, 50);
+      }
+
+      var imageLoader = document.getElementById('userImage');
+
+      imageLoader.addEventListener('change', function (event) {
+
+        var reader = new FileReader();
+
+        reader.onload = function (file) {
+          var userImage = new Image();
+          userImage.onload = function () {
+            context.drawImage(userImage, 0, 0, 300, 300);
+            drawOverlay();
+          };
+          userImage.src = file.target.result;
+          uploadedFilename = imageLoader.files[0].name;
+          renderTrigger.style.display = 'block';
+        };
+
+        reader.readAsDataURL(event.target.files[0]);
+
+      });
+
+      var renderTrigger = document.getElementById('render');
+      renderTrigger.style.display = 'none';
+
+      var downloader = document.createElement('a');
+
+      renderTrigger.addEventListener('click', function () {
+        var renderedImageData = canvas.toDataURL('image/png');
+
+        downloader.download = 'Bloc ' + uploadedFilename;
+        downloader.href = renderedImageData;
+
+        downloader.click();
+      });
+
+    </script>
+  </body>
+</html>
